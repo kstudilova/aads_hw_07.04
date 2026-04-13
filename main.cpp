@@ -46,7 +46,41 @@ T value(BTreeIt< T, K > it)
 template< class T, size_t K >
 BTreeIt< T, K > next(BTreeIt< T ,K > it)
 {
+  BTree<T, K>* next = it.current;
+  size_t ind = it.s;
+    
+  if (!next)
+  {
+    return {0, nullptr};
+  }
 
+  if (next->children[ind + 1])
+  {
+    next = next->children[ind + 1];
+    next = minimum(next).current;
+    return {0, next};
+  }
+    
+  if (ind + 1 < K)
+  {
+    return {ind + 1, next};
+  }
+
+  BTree<T, K>* parent = next->parent;
+  while (parent) {
+    size_t i = 0;
+    for (; i <= K && parent->children[i] != next; ++i) {}
+        
+    if (i < K)
+    {
+      return {i, parent};
+    }
+        
+    next = parent;
+    parent = next->parent;
+  }
+    
+  return {0, nullptr};
 }
 
 template< class T, size_t K >
