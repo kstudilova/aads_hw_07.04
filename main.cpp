@@ -158,13 +158,13 @@ BTreeIt< T, K > prev(BTreeIt< T ,K > it)
 template< class T, size_t K >
 bool hasNext(BTreeIt< T ,K > it)
 {
-
+  return next(it).current;
 }
 
 template< class T, size_t K >
 bool hasPrev(BTreeIt< T ,K > it)
 {
-    
+  return prev(it).current;
 }
 
 int main()
