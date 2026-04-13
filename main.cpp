@@ -16,25 +16,33 @@ struct BTreeIt
 };
 
 template<class T, size_t K>
-BTreeIt<T, K> minimum(BTree<T, K>* node)
+BTree<T, K>* minimum(BTree<T, K>* root)
 {
-  if (!node) return {0, nullptr};
-  while (node->children[0]) {
-    node = node->children[0];
+  if (!root)
+  {
+    return root;
   }
-  return {0, node};
+
+  while (root->childs[0])
+  {
+    root = root->childs[0];
+  }
+  return root;
 }
 
 template<class T, size_t K>
-BTreeIt<T, K> maximum(BTree<T, K>* node)
+BTree<T, K>* maximum(BTree<T, K>* root)
 {
-  if (!node) return {0, nullptr};
-  while (node->children[K]) {
-    node = node->children[K];
+  if (!root)
+  {
+    return root;
   }
-  size_t last = K - 1;
-  while (last > 0 && node->val[last] == T()) last--;
-  return {last, node};
+
+  while (root->childs[K])
+  {
+    root = root->childs[K];
+  }
+  return root;
 }
 
 template< class T, size_t K >
@@ -51,42 +59,100 @@ BTreeIt< T, K > next(BTreeIt< T ,K > it)
     
   if (!next)
   {
-    return {0, nullptr};
+    return it;
   }
 
-  if (next->children[ind + 1])
+  if (ind < K - 1)
   {
-    next = next->children[ind + 1];
-    next = minimum(next).current;
-    return {0, next};
-  }
-    
-  if (ind + 1 < K)
-  {
-    return {ind + 1, next};
-  }
-
-  BTree<T, K>* parent = next->parent;
-  while (parent) {
-    size_t i = 0;
-    for (; i <= K && parent->children[i] != next; ++i) {}
-        
-    if (i < K)
+    if (next->childs[ind + 1])
     {
-      return {i, parent};
+      next = next->childs[ind + 1];
+      next = minimum(next);
+      ind = 0;
+    } else {
+      ++ind;
     }
-        
-    next = parent;
-    parent = next->parent;
+  } else {
+    if (next->childs[K])
+    {
+      next = next->childs[K];
+      next = minimum(next);
+      ind = 0;
+    } else {
+      BTree<T, K>* parent = next->parent;
+      while (parent)
+      {
+        if (parent->childs[K] != next)
+        {
+          for (size_t i = 0; i < K; ++i)
+          {
+            if (parent->childs[i] == next)
+            {
+              ind = i;
+              break;
+            }
+          }
+          break;
+        }
+        next = parent;
+        parent = next->parent;
+      }
+      next = parent;
+    }
   }
-    
-  return {0, nullptr};
+  return {ind, next};
 }
 
 template< class T, size_t K >
 BTreeIt< T, K > prev(BTreeIt< T ,K > it)
 {
-    
+  BTree<T, K>* next = it.current;
+  size_t ind = it.s;
+
+  if (!next)
+  {
+    return it;
+  }
+
+  if (ind != 0)
+  {
+    if (next->childs[ind])
+    {
+      next = next->childs[ind];
+      next = maximum(next);
+      ind = K - 1;
+    } else {
+      --ind;
+    }
+  } else {
+    if (next->childs[ind])
+    {
+      next = next->childs[ind];
+      next = maximum(next);
+      ind = K - 1;
+    } else {
+      BTree<T, K>* parent = next->parent;
+      while (parent)
+      {
+        if (parent->childs[0] != next)
+        {
+          for (size_t i = K; i > 0; --i)
+          {
+            if (parent->childs[i] == next)
+            {
+              ind = i - 1;
+              break;
+            }
+          }
+          break;
+        }
+        next = parent;
+        parent = next->parent;
+      }
+      next = parent;
+    }
+  }
+  return {ind, next};
 }
 
 template< class T, size_t K >
