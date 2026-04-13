@@ -169,5 +169,26 @@ bool hasPrev(BTreeIt< T ,K > it)
 
 int main()
 {
-  
+  BTree<int, 3>* root = new BTree<int, 3>();
+  root->val[0] = 1;
+  root->val[1] = 2;
+  root->val[2] = 3;
+    
+  for (size_t i = 0; i <= 3; ++i)
+  {
+    root->childs[i] = nullptr;
+  }
+  root->parent = nullptr;
+    
+  BTreeIt<int, 3> it{0, root};
+    
+  while (hasNext(it))
+  {
+    std::cout << value(it) << " ";
+    it = next(it);
+  }
+  std::cout << value(it) << "\n";
+    
+  delete root;
+  return 0;
 }
